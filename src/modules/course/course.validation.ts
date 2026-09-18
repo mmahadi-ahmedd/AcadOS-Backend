@@ -17,4 +17,6 @@ const updateValidation = z.object({
   }),
 });
 
+
+
 export const CourseValidation = { createValidation, updateValidation };
