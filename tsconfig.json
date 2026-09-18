@@ -8,8 +8,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]  
   },
   "include": ["src"],
-  "exclude": ["node_modules", "prisma", "dist"]
+  "exclude": ["node_modules", "prisma", "dist"],
+  
 }
