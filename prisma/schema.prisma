@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ENROLLED
+  DROPPED
+  COMPLETED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  SSLCOMMERZ
+  STRIPE
+  BKASH
+}
+
+// ─── Auth / Users ───────────────────────────────────────
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String?
+  googleId      String?   @unique
+  role          Role
+  name          String
+  phone         String?
+  isVerified    Boolean   @default(false)
+  refreshToken  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  student       Student?
+  instructor    Instructor?
+  auditLogs     AuditLog[]
+
+  @@index([role])
+  @@index([deletedAt])
+}
+
+model Student {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  studentId     String    @unique
+  departmentId  String
+  department    Department @relation(fields: [departmentId], references: [id])
+  programId     String
+  program       Program   @relation(fields: [programId], references: [id])
+  enrollYear    Int
+  cgpa          Float?    @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  enrollments   Enrollment[]
+  attendances   Attendance[]
+  results       Result[]
+  fees          Fee[]
+
+  @@index([departmentId])
+  @@index([programId])
+}
+
+model Instructor {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  employeeId    String    @unique
+  departmentId  String
+  department    Department @relation(fields: [departmentId], references: [id])
+  designation   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  sections      Section[]
+
+  @@index([departmentId])
+}
+
+// ─── Academic Structure ─────────────────────────────────
+
+model Department {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  code        String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  programs    Program[]
+  courses     Course[]
+  students    Student[]
+  instructors Instructor[]
+}
+
+model Program {
+  id           String    @id @default(uuid())
+  name         String
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+  degreeLevel  String
+  totalCredits Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  students     Student[]
+
+  @@index([departmentId])
+}
+
+model Course {
+  id            String    @id @default(uuid())
+  code          String    @unique
+  title         String
+  creditHours   Int
+  departmentId  String
+  department    Department @relation(fields: [departmentId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  sections      Section[]
+  prerequisites CoursePrerequisite[] @relation("CourseToPrereq")
+  requiredFor   CoursePrerequisite[] @relation("PrereqToCourse")
+
+  @@index([departmentId])
+  @@index([title])
+}
+
+model CoursePrerequisite {
+  id             String @id @default(uuid())
+  courseId       String
+  course         Course @relation("CourseToPrereq", fields: [courseId], references: [id])
+  prerequisiteId String
+  prerequisite   Course @relation("PrereqToCourse", fields: [prerequisiteId], references: [id])
+
+  @@unique([courseId, prerequisiteId])
+}
+
+model Semester {
+  id          String    @id @default(uuid())
+  name        String
+  year        Int
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  sections    Section[]
+  fees        Fee[]
+
+  @@unique([name, year])
+}
+
+model Section {
+  id            String    @id @default(uuid())
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id])
+  semesterId    String
+  semester      Semester  @relation(fields: [semesterId], references: [id])
+  instructorId  String
+  instructor    Instructor @relation(fields: [instructorId], references: [id])
+  sectionCode   String
+  capacity      Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  enrollments   Enrollment[]
+  attendances   Attendance[]
+  exams         Exam[]
+
+  @@unique([courseId, semesterId, sectionCode])
+  @@index([instructorId])
+  @@index([semesterId])
+}
+
+// ─── Enrollment / Attendance / Exam / Result ────────────
+
+model Enrollment {
+  id          String            @id @default(uuid())
+  studentId   String
+  student     Student           @relation(fields: [studentId], references: [id])
+  sectionId   String
+  section     Section           @relation(fields: [sectionId], references: [id])
+  status      EnrollmentStatus  @default(PENDING)
+  enrolledAt  DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  @@unique([studentId, sectionId])
+  @@index([status])
+}
+
+model Attendance {
+  id          String            @id @default(uuid())
+  studentId   String
+  student     Student           @relation(fields: [studentId], references: [id])
+  sectionId   String
+  section     Section           @relation(fields: [sectionId], references: [id])
+  date        DateTime
+  status      AttendanceStatus
+  createdAt   DateTime          @default(now())
+
+  @@unique([studentId, sectionId, date])
+  @@index([sectionId, date])
+}
+
+model Exam {
+  id          String    @id @default(uuid())
+  sectionId   String
+  section     Section   @relation(fields: [sectionId], references: [id])
+  title       String
+  totalMarks  Int
+  examDate    DateTime
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  results     Result[]
+
+  @@index([sectionId])
+}
+
+model Result {
+  id          String    @id @default(uuid())
+  examId      String
+  exam        Exam      @relation(fields: [examId], references: [id])
+  studentId   String
+  student     Student   @relation(fields: [studentId], references: [id])
+  marksObtained Float
+  gradePoint  Float?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([examId, studentId])
+  @@index([studentId])
+}
+
+// ─── Fees / Payments ─────────────────────────────────────
+
+model Fee {
+  id          String        @id @default(uuid())
+  studentId   String
+  student     Student       @relation(fields: [studentId], references: [id])
+  semesterId  String
+  semester    Semester      @relation(fields: [semesterId], references: [id])
+  amount      Float
+  status      PaymentStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  payments    Payment[]
+
+  @@unique([studentId, semesterId])
+}
+
+model Payment {
+  id            String          @id @default(uuid())
+  feeId         String
+  fee           Fee             @relation(fields: [feeId], references: [id])
+  provider      PaymentProvider
+  transactionId String?         @unique
+  amount        Float
+  status        PaymentStatus   @default(PENDING)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([status])
+}
+
+// ─── Audit ───────────────────────────────────────────────
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  action      String
+  entityType  String
+  entityId    String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+}
