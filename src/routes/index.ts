@@ -18,7 +18,7 @@ const moduleRoutes = [
   { path: "/courses", route: CourseRoutes },
   { path: "/semesters", route: SemesterRoutes },
   { path: "/sections", route: SectionRoutes },
-  { path: "/enrollments", route: EnrollmentRoutes },
+  { path: "/enrollments", route: EnrollmentRoutes }
 ];
 
 moduleRoutes.forEach((r) => router.use(r.path, r.route));
