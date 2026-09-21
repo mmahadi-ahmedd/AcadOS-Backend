@@ -14,17 +14,20 @@ const getAllSemesters = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getSemesterById = catchAsync(async (req: Request, res: Response) => {
-  const result = await SemesterService.getSemesterById(req.params.id);
+  const semesterId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await SemesterService.getSemesterById(semesterId);
   sendResponse(res, { statusCode: 200, success: true, message: "Semester retrieved successfully", data: result });
 });
 
 const updateSemester = catchAsync(async (req: Request, res: Response) => {
-  const result = await SemesterService.updateSemester(req.params.id, req.body);
+  const semesterId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await SemesterService.updateSemester(semesterId, req.body);
   sendResponse(res, { statusCode: 200, success: true, message: "Semester updated successfully", data: result });
 });
 
 const deleteSemester = catchAsync(async (req: Request, res: Response) => {
-  await SemesterService.softDeleteSemester(req.params.id);
+  const semesterId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  await SemesterService.softDeleteSemester(semesterId);
   sendResponse(res, { statusCode: 200, success: true, message: "Semester deleted successfully", data: null });
 });
 

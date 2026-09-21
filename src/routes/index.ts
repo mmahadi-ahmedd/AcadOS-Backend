@@ -3,14 +3,20 @@ import { AuthRoutes } from "../modules/auth/auth.routes";
 import { DepartmentRoutes } from "../modules/department/department.routes";
 import { ProgramRoutes } from "../modules/program/program.routes";
 import { CourseRoutes } from "../modules/course/course.routes";
+import { SemesterRoutes } from "../modules/semester/semester.routes";
+import { SectionRoutes } from "../modules/section/section.routes";
+import { UserRoutes } from "../modules/user/user.routes";
 
 const router = Router();
 
 const moduleRoutes = [
   { path: "/auth", route: AuthRoutes },
+  { path: "/users", route: UserRoutes },
   { path: "/departments", route: DepartmentRoutes },
   { path: "/programs", route: ProgramRoutes },
   { path: "/courses", route: CourseRoutes },
+  { path: "/semesters", route: SemesterRoutes },
+  { path: "/sections", route: SectionRoutes },
 ];
 
 moduleRoutes.forEach((r) => router.use(r.path, r.route));

@@ -14,7 +14,8 @@ const getAllSections = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getSectionById = catchAsync(async (req: Request, res: Response) => {
-  const result = await SectionService.getSectionById(req.params.id);
+  const sectionId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await SectionService.getSectionById(sectionId);
   sendResponse(res, { statusCode: 200, success: true, message: "Section retrieved successfully", data: result });
 });
 
@@ -24,12 +25,14 @@ const getMySections = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateSection = catchAsync(async (req: Request, res: Response) => {
-  const result = await SectionService.updateSection(req.params.id, req.body);
+  const sectionId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await SectionService.updateSection(sectionId, req.body);
   sendResponse(res, { statusCode: 200, success: true, message: "Section updated successfully", data: result });
 });
 
 const deleteSection = catchAsync(async (req: Request, res: Response) => {
-  await SectionService.softDeleteSection(req.params.id);
+  const sectionId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  await SectionService.softDeleteSection(sectionId);
   sendResponse(res, { statusCode: 200, success: true, message: "Section deleted successfully", data: null });
 });
 
