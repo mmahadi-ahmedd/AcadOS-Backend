@@ -14,17 +14,20 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getCourseById = catchAsync(async (req: Request, res: Response) => {
-  const result = await CourseService.getCourseById(req.params.id);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await CourseService.getCourseById(String(id));
   sendResponse(res, { statusCode: 200, success: true, message: "Course retrieved successfully", data: result });
 });
 
 const updateCourse = catchAsync(async (req: Request, res: Response) => {
-  const result = await CourseService.updateCourse(req.params.id, req.body);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await CourseService.updateCourse(String(id), req.body);
   sendResponse(res, { statusCode: 200, success: true, message: "Course updated successfully", data: result });
 });
 
 const deleteCourse = catchAsync(async (req: Request, res: Response) => {
-  await CourseService.softDeleteCourse(req.params.id);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  await CourseService.softDeleteCourse(String(id));
   sendResponse(res, { statusCode: 200, success: true, message: "Course deleted successfully", data: null });
 });
 

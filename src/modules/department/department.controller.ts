@@ -14,17 +14,20 @@ const getAllDepartments = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getDepartmentById = catchAsync(async (req: Request, res: Response) => {
-  const result = await DepartmentService.getDepartmentById(req.params.id);
+  const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
+  const result = await DepartmentService.getDepartmentById(id as string);
   sendResponse(res, { statusCode: 200, success: true, message: "Department retrieved successfully", data: result });
 });
 
 const updateDepartment = catchAsync(async (req: Request, res: Response) => {
-  const result = await DepartmentService.updateDepartment(req.params.id, req.body);
+  const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
+  const result = await DepartmentService.updateDepartment(id as string, req.body);
   sendResponse(res, { statusCode: 200, success: true, message: "Department updated successfully", data: result });
 });
 
 const deleteDepartment = catchAsync(async (req: Request, res: Response) => {
-  await DepartmentService.softDeleteDepartment(req.params.id);
+  const id = typeof req.params.id === "string" ? req.params.id : req.params.id?.[0];
+  await DepartmentService.softDeleteDepartment(id as string);
   sendResponse(res, { statusCode: 200, success: true, message: "Department deleted successfully", data: null });
 });
 

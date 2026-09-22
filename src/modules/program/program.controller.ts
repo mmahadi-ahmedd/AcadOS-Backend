@@ -14,17 +14,20 @@ const getAllPrograms = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getProgramById = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProgramService.getProgramById(req.params.id);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await ProgramService.getProgramById(id as string);
   sendResponse(res, { statusCode: 200, success: true, message: "Program retrieved successfully", data: result });
 });
 
 const updateProgram = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProgramService.updateProgram(req.params.id, req.body);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const result = await ProgramService.updateProgram(id as string, req.body);
   sendResponse(res, { statusCode: 200, success: true, message: "Program updated successfully", data: result });
 });
 
 const deleteProgram = catchAsync(async (req: Request, res: Response) => {
-  await ProgramService.softDeleteProgram(req.params.id);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  await ProgramService.softDeleteProgram(id as string);
   sendResponse(res, { statusCode: 200, success: true, message: "Program deleted successfully", data: null });
 });
 
