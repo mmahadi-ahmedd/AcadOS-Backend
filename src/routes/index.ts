@@ -10,6 +10,8 @@ import { EnrollmentRoutes } from "../modules/enrollment/enrollment.routes";
 import { AttendanceRoutes } from "../modules/attendance/attendance.routes";
 import { ExamRoutes } from "../modules/exam/exam.routes";
 import { ResultRoutes } from "../modules/result/result.routes";
+import { FeeRoutes } from "../modules/fee/fee.routes";
+import { PaymentRoutes } from "../modules/payment/payment.routes";
 
 const router = Router();
 
@@ -25,6 +27,8 @@ const moduleRoutes = [
   { path: "/attendance", route: AttendanceRoutes },
   { path: "/exams", route: ExamRoutes },
   { path: "/results", route: ResultRoutes },
+  { path: "/fees", route: FeeRoutes },
+  { path: "/payments", route: PaymentRoutes },
 ];
 
 moduleRoutes.forEach((r) => router.use(r.path, r.route));
