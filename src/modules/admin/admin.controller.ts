@@ -9,12 +9,15 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateUserRole = catchAsync(async (req: Request, res: Response) => {
-  const result = await AdminService.updateUserRole(req.user!.userId, req.params.id, req.body.role);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const role = Array.isArray(req.body.role) ? req.body.role[0] : req.body.role;
+  const result = await AdminService.updateUserRole(req.user!.userId, id, role);
   sendResponse(res, { statusCode: 200, success: true, message: "User role updated successfully", data: result });
 });
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  await AdminService.softDeleteUser(req.user!.userId, req.params.id);
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  await AdminService.softDeleteUser(req.user!.userId, id);
   sendResponse(res, { statusCode: 200, success: true, message: "User deleted successfully", data: null });
 });
 
