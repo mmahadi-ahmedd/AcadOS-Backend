@@ -1,5 +1,5 @@
 import SSLCommerzPayment from "sslcommerz-lts";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import prisma from "../../config/prisma";
 import AppError from "../../utils/AppError";
 import { config } from "../../config/env";
@@ -15,7 +15,7 @@ const initiatePayment = async (studentUserId: string, feeId: string) => {
   if (!fee) throw new AppError(404, "Fee not found.");
   if (fee.status === "PAID") throw new AppError(400, "This fee has already been paid.");
 
-  const tranId = `ACADOS-${uuidv4()}`;
+  const tranId = `ACADOS-${randomUUID()}`;
 
   const payment = await prisma.payment.create({
     data: {
