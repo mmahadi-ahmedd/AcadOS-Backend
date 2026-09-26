@@ -3,8 +3,7 @@
 A production-grade backend for managing university academics end-to-end: student registration, course enrollment, attendance, exams, GPA calculation, and semester fee payments — built as a fully role-based REST API with zero frontend dependency.
 
 **Live API:** https://acados-backend.vercel.app
-**API Docs (Postman):** <paste your Postman share link here>
-**Demo Video:** <paste your video link here>
+**API Docs (Postman):** <https://www.postman.com/ahmedmahadi2003-47b33412-965982/acados-workspace/collection/54786387-dda4b8bc-1528-43f4-b877-aa3d09bbb8db>
 
 ---
 
